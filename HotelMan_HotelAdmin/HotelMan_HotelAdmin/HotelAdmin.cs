@@ -48,7 +48,7 @@ public class HotelAdmin
             return response;
         }
         
-        Console.WriteLine(token);
+
         var tokenDetails = new JwtSecurityToken(token);
         var userId = tokenDetails.Claims.FirstOrDefault(x => x.Type == "sub")?.Value;
         
@@ -59,7 +59,7 @@ public class HotelAdmin
         var hotels = await dbContext.ScanAsync<Hotel>(new[] { new ScanCondition("UserId", ScanOperator.Equal, userId) })
             .GetRemainingAsync();
 
-        response.Body = JsonSerializer.Serialize(hotels);
+        response.Body = JsonSerializer.Serialize(new {Hotels=hotels});
         
         return response;
     }
@@ -74,13 +74,16 @@ public class HotelAdmin
         response.Headers.Add("Access-Control-Allow-Origin", "*");
         response.Headers.Add("Access-Control-Allow-Headers", "*");
         response.Headers.Add("Access-Control-Allow-Methods", "OPTIONS,POST");
+        response.Headers.Add("Content-Type","application/json");
 
         var bodyContent = request.IsBase64Encoded
             ? Convert.FromBase64String(request.Body)
             : Encoding.UTF8.GetBytes(request.Body);
 
+        Console.WriteLine($"Request size after decode: {bodyContent.Length}");
+        
         await using var memStream = new MemoryStream(bodyContent);
-        var formData = await MultipartFormDataParser.ParseAsync(memStream);
+        var formData = await MultipartFormDataParser.ParseAsync(memStream).ConfigureAwait(false);
 
         var hotelName = formData.GetParameterValue("hotelName");
         var hotelRating = formData.GetParameterValue("hotelRating");
@@ -90,10 +93,8 @@ public class HotelAdmin
         var file = formData.Files.FirstOrDefault();
         var fileName = file.FileName;
 
-        await using var fileContentStream = new MemoryStream();
-        await file.Data.CopyToAsync(fileContentStream);
-        fileContentStream.Position = 0;
-
+        
+        
         var userId = formData.GetParameterValue("userId");
         var idToken = formData.GetParameterValue("idToken");
 
@@ -118,8 +119,7 @@ public class HotelAdmin
             {
                 BucketName = bucketName,
                 Key = fileName,
-                InputStream = fileContentStream,
-                AutoCloseStream = true
+                InputStream = file.Data
             });
 
             var hotel = new Hotel
@@ -141,9 +141,9 @@ public class HotelAdmin
             Console.WriteLine(e);
             throw;
         }
+        
 
-        Console.WriteLine("OK.");
-
+        response.Body = JsonSerializer.Serialize(new { Message = "Hotel information was stored successfully." });
         return response;
     }
 }
