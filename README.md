@@ -1,4 +1,4 @@
-# Build Microservices with AWS and .NET (update 2023)
+# Build Microservices with AWS and .NET (Second Edition)
 # The Hotel Manager Microservice
 
 
@@ -9,8 +9,8 @@
 This microservice code is part of an online course called ["Build Microservices with .NET and Amazon Web Services"](https://www.udemy.com/course/build-microservices-with-aspnet-core-amazon-web-services/?referralCode=B288BF33506B34292176)
 
 
-The course explains how a microservices-based system is developed and what relevant design patterns are applied in any given scenarios.
+The course explains how a microservices-based system is designed and developed using Amazon Web Services and .Net.
 
-View the full course here:
+View the entire course here:
 
 ["Build Microservices with .NET and Amazon Web Services"](https://www.udemy.com/course/build-microservices-with-aspnet-core-amazon-web-services/?referralCode=B288BF33506B34292176)
